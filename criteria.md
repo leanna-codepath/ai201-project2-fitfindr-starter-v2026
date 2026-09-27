@@ -25,9 +25,10 @@ Given a query that matches at least one listing, the agent completes all three
 tool calls and returns a fit card — in at least 4 of 5 tries.
 
 **Why this target:**
-<!-- Why 4 of 5 and not 5 of 5? Something about your search, probably —
-     "my search is a plain keyword match and some phrasings will miss" is a
-     real answer. -->
+This criteria lists 4 out of 5 tries instead of 5 out of 5 tries because a matching
+that goes through all three tool calls must use the model. Because the model has room
+for failure, like hitting the rate limit or a failed connection, a target of 4 out of 5
+leaves toom for leeway.
 
 ---
 
@@ -37,66 +38,48 @@ Given a query that matches no listings, the agent stops before calling
 `suggest_outfit` and returns a message naming what to change — 5 of 5 tries.
 
 **Why this target:**
-<!-- Why is 5 of 5 reasonable here when criterion 1 isn't? What's different
-     about this path? -->
+5 out of 5 is a reasonable target because all impossible queries must stop
+before calling `suggest_outfit`. The agent cannot branch into `suggest_outfit` when
+it recieves an empty list, especially since that function requires at least one listing
+dictionary. There are no other paths for an empty matching.
 
 ---
 
-## 3. Something about state
+## 3. The item the search function found is the same item in the next two tools
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know that the item your search found is the same item the
-     next tool received? Name something countable or observable.
-
-     This is the criterion people find hardest, because state failure doesn't
-     look like state failure — it looks like a tool problem. Something that
-     compares session["selected_item"] against what actually reached
-     suggest_outfit is the shape you're after. -->
-
+Given a query that matches at least one listing, the same item is used in the next
+two tools - for 5 out of 5 tries. This can be confirmed by comparing the `id` fields
+between the best match in `search_listings` and the `new_item` in `suggest_outfit` and
+the title/price of the item mentioned in the fit card produced by `create_fit_card` 
 
 
 **Why this target:**
-
-
+I chose a target of 5 out of 5 because the new thrifted item found in the search should
+be static between each step in the loop. If it is not, then a mutation has occurred
+somewhere in the loop, which is a bug that needs to be fixed.
 
 ---
 
-## 4. Something about the fit card
+## 4.The fit card contains the title and price of the item
 
-<!-- YOU WRITE THIS ONE.
-
-     The fit card calls a model, so the same input can produce different words
-     each time. That's not a bug — it's the nature of the tool. So what would
-     make it acceptable?
-
-     Think about what you'd actually be unhappy to see. A caption that never
-     mentions the price? Two different items producing the same opening
-     sentence? A card longer than a caption anyone would post? Any of those can
-     be turned into a number. -->
-
-
+Every fit card contains the title and price of the thrifted item - 5 out of 5 tries
+on an item. 
 
 **Why this target:**
-
-
+The criteria follows from the previous- you cannot match an item based 
+on its title and price if it doesn't appear in the card. It was also be difficult for others
+to find the item without this important information.
 
 ---
 
-## 5. Your choice
-
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. Speed, the empty
-     wardrobe path, what happens when the model can't be reached, whether the
-     search respects a price ceiling — anything, as long as it names a number
-     or an observable outcome. -->
-
-
+## 5. The caption should only include natural sentences
+The caption should only include natural sentences, no bullet points, key: value pairings, 
+or otherwise syntactical notation - 4 out of 5 test cases.
 
 **Why this target:**
-
-
+I picked 4 out of 5 instead of 5 out of 5 because this criterion depends on the variability
+of the model, which may decide to use more syntactical notation to reduce the word count or
+make it easier to read.
 
 ---
 
