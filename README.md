@@ -20,28 +20,16 @@
 
 ---
 
-<!-- ─────────────────────────────────────────────────────────────────────────
-     HOW TO USE THIS FILE
-
-     This is your submission. Fill each section in as you finish the milestone
-     it belongs to — don't leave it all to the end.
-
-     Unit 3 asks for the first five sections. Unit 4 adds the five below them.
-     Leave the unit 4 sections alone until then; they're here so you know
-     what's coming.
-
-     Everything is pasted as TEXT. No screenshots, no images, no video links.
-     A typed block of output gets full credit; a picture of the same output
-     gets none.
-     ───────────────────────────────────────────────────────────────────────── -->
-
 <!-- ═══════════════════════ UNIT 3 — THE BUILD ═══════════════════════ -->
 
 ## What This Does
 
-<!-- Three or four sentences: what a user asks for, and what they get back. -->
-
-
+FitFindr is a tool for users to find clothes among a series of 40 second-hand listings and
+determine how the best match for their query fits in with the rest of their wardrobe. It also
+writes a caption describing your new find. To use it, users can use following command in their 
+CLI: `python app.ask 'query'` where queries are of the format "90s track jacket in size M" or
+"denim jacket under $50". For empty matches, it suggests three changes, words, size, and max
+price, to ensure you can adapt your queries.
 
 ---
 
@@ -60,23 +48,42 @@
 ### `search_listings`
 
 - **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
+     Searches the listings for items matching a given description and returns matches, with the best match being first.
+- **Inputs:** 
+     - description (str): Keywords describing the user's query
+     - size (str | None): The size of the garment the user is searching for. Can be None to skip filtering by size
+     - max_price (float | None): The ceiling price the user is willing to pay. Can be None to skip filtering by price
 - **Returns:**
+     A list of matching listing dictionary objects, each with `id`, `title`, `description`, `category`, `style_tags`, `size`,
+     `condition`, `price`, `colors`, `brand`, and `platform`. Sorted with the best match first.
 - **When it has nothing:**
+     Returns an empty list.
 
 ### `suggest_outfit`
 
 - **What it does:**
+     Suggests two outfits the user can wear based on a given thrifted item and the user's wardrobe.
 - **Inputs:**
+     - new_item (dict): A listing dictionary of the thrifted item the user wants to use
+     - wardrobe (dict): A wardrobe dictionary where the key `items` is a list of item dictionaries.
 - **Returns:**
+     A non-empty string with outfit suggestions or general styling advice to go with the thrifted item.
 - **When it has nothing:**
+     If given an empty wardrobe, the funciton returns a non-empty string that give general styling advice.
+     It never returns an empty string, an exception, or None.
 
 ### `create_fit_card`
 
 - **What it does:**
+     Writes a short caption that someone would post about their thrift find and the outfits that go with it.
 - **Inputs:**
+     - outfit (str): An outfit suggestion (obtained from `suggest_outfit`)
+     - new_item (dict): The listing dictionary for the new thrifted outfit
 - **Returns:**
+     A non-empty string that reads like the caption to a post about the thrifted item. The string should
+     mention the item, its price, and its platform once, along with its vibe.
 - **When it has nothing:**
+     If the `outfit` string is empty, it returns a description about the item and its vibe.
 
 ---
 
