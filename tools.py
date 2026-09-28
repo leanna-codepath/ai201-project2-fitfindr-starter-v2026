@@ -27,6 +27,63 @@ from utils.data_loader import load_listings
 
 # ── Tool 1: search_listings ───────────────────────────────────────────────────
 
+def remove_fluff(description):
+    fluff = {'a', 'an', 'and', 'any', 'at', 'be', 'beautiful', 'but', 'few', 
+    'for', 'from', 'fits', 'great', 'i', 'in', 'is', 'it', 'inspired', 'like', 'my', 'me',
+     'looking', 'of', 'on', 'or', 'otherwise','over', 'need', 'please', 'find', 'get',
+    'owned', 'perfect', 'says', 'size', 'some', 'something', 'super', 'the', 'to',
+    'under', 'very', 'want', 'when', 'which', 'with', 'would', 'your', 'that', 'this'}
+
+    description = (description or "").lower()
+    words = []
+    currentWord = ""
+
+    for char in description:
+        if ('a' <= char <= 'z') or ('0' <= char <= '9') or (char == "'"):
+            currentWord += char
+        elif currentWord:
+            words.append(currentWord)
+            currentWord = ""
+
+    if currentWord:
+        words.append(currentWord) 
+
+    return {word for word in words if word not in fluff and len(word) > 1}
+
+def get_sizes(size):
+    text = size or ""
+
+    cleaned_chars = []
+    inside_parentheses = False
+
+    for char in text:
+        if char == "(":
+            inside_parentheses = True
+        elif char == ")":
+            inside_parentheses = False
+        elif not inside_parentheses:
+            cleaned_chars.append(char)
+
+    cleaned = "".join(cleaned_chars)
+    diff_parts = cleaned.split("/")
+
+    parts = []
+    for part in diff_parts:
+        parts.append((part.strip()).lower())
+
+    return {part for part in parts if part}
+
+def matching_size(size_query, size_listing):
+    if not size_query:
+        return True
+
+    found_sizes = get_sizes(size_listing)
+    for size in found_sizes:
+        if size.startswith("one size"):
+            return True
+
+    return bool(get_sizes(size_query) & found_sizes)
+
 def search_listings(
     description: str,
     size: str | None = None,
@@ -78,11 +135,48 @@ def search_listings(
     Test it from a terminal before you move on:
         python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
     """
-    # TODO: replace this with your implementation
-    return []
+    listings = load_listings()
+    cleanDescription = remove_fluff(description)
+
+    matches = []
+    for listing in listings:
+        if max_price is not None and listing["price"] > max_price:
+            continue
+
+        if size and not matching_size(size, listing.get("size", "")):
+            continue
+
+        keywords = " ".join(
+        [
+            listing.get("title", ""),
+            listing.get("description", ""),
+            listing.get("category", ""),
+            listing.get("brand") or "",
+            " ".join(listing.get("style_tags", [])),
+            " ".join(listing.get("colors", [])),
+        ]
+        )
+        score = len(cleanDescription & remove_fluff(keywords))
+        if score:
+            matches.append((score, listing["price"], listing))
+
+    matches.sort(key=lambda x: (-x[0], x[1]))
+    return [match for _,_,match in matches[:config.SEARCH_RESULT_LIMIT]]
 
 
 # ── Tool 2: suggest_outfit ────────────────────────────────────────────────────
+
+def item_description(item):
+    style = ', '.join(item["style_tags"]) if item.get("style_tags", []) else "unspecified"
+    colors = ', '.join(item["colors"]) if item.get("colors", []) else "unspecified"
+
+    return (
+        f"{item['title']} - {item['category']}"
+        f"size: {item['size']}, {item['condition']} condition"
+        f"colors: {colors}"
+        f"style: {style}"
+        f"{item['price']} on {item['platform']}"
+    )
 
 def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
     """
@@ -112,8 +206,36 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
     Test it from a terminal before you move on:
         python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
     """
-    # TODO: replace this with your implementation
-    return ""
+    wardrobe_items = [] if not wardrobe or not wardrobe['items'] else wardrobe['items']
+    new_item_prompt = item_description(new_item)
+
+    if not wardrobe_items:
+        prompt = (
+            f"Someone is thinking about buying the following second-hand item:\n"
+            f"  {new_item_prompt}\n\n"
+            f"They do not have a wardrobe saved and you do not know what they own.\n"
+            f"Suggest two outfits built around this item, describing each piece in a genertic way ('a light, loose blouse', no brands)"
+            f"Open by saying these are general ideas no wardrobe has been provided"
+        )
+    else:
+        wardrobe_items_des = []
+        for item in wardrobe_items:
+            colors = ', '.join(item["colors"]) if item.get("colors", []) else "unspecified"
+            wardrobe_items_des.append((
+                f"{item['name']} - {item['category']}; {colors}"
+            ))
+        wardrobe_items_prompt = '\n'.join(wardrobe_items_des)
+        prompt = (
+            f"Someone is thinking about buying the following second-hand item:\n"
+            f"  {new_item_prompt}\n\n"
+            f"They own the following items:\n{wardrobe_items_prompt}\n\n"
+            f"Suggest two outfits built around the new item by pairing it with items this person already owns."
+            f"Name the owned pieces exactly as they are written above. Do not invent pieces they do not own."
+        )
+
+    return generate(prompt, system="You style thrifted clothing. Be concrete and succient. Name real garments, not just" \
+    "colors or brands. Do not include any preamble, sign-off, or markdown headings")
+
 
 
 # ── Tool 3: create_fit_card ───────────────────────────────────────────────────
@@ -152,5 +274,19 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
     Test it from a terminal before you move on:
         python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
     """
-    # TODO: replace this with your implementation
-    return ""
+    if not outfit:
+        return "No fit card was created as no outfit suggestion was received. Please check the suggest_outfit function."
+
+    prompt = (
+        f"The person found:\n {item_description(new_item)}\n\n"
+        f"The outfit they plan to wear with it:\n{outfit}\n\n"
+        f"Write the caption they would post about this fine and outfit\n"
+        f"The caption must include three details which would allow readers to find the outfit themselves:"
+        f"the item title,\n the price written in digits as the format ${new_item['price']:g},\n"
+        f"the platform written in the form {new_item['platform']}\n"
+        f"These details should be written in natural sentences, not listed."
+        f"The look should also be specific, it should not like a product description"
+    )
+
+    return generate(prompt, system="You write short captions for thrift finds, in the perspective of the person who" \
+    "found it. They are two to four sentences. No walls of hastags, markdowns, or headings.")
