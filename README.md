@@ -113,7 +113,21 @@ The first match from `search_listings` moves through the session.
 **One full query**
 
 ```
-$ python app.py ask '...'
+$ python app.py ask 'college crewneck size XL under $25'
+
+  Found:    Oversized College Crewneck — Faded Red — $21.0 on thredUp
+
+  Outfit:   Outfit 1: Pair the oversized college crewneck with the baggy straight-leg jeans, black crossbody bag, and chunky white sneakers. Add the brown leather belt to define the waist.
+
+Outfit 2: Layer the oversized college crewneck over the white ribbed tank top, paired with the wide-leg khaki trousers and black combat boots.
+
+  Fit card: I seriously manifested this Oversized College Crewneck in faded red the second I saw it sitting on thredUp for just $21. I am living in this exact piece this season, especially thrown over wide-leg khaki trousers with chunky black combat boots and a peek of a ribbed white tank. When I want a more laid-back vibe, I just tuck it into baggy straight-leg jeans with a leather belt and my favorite white sneakers. It has that perfectly broken-in athletic vintage feel that usually takes years to find.
+
+```
+
+$ python app.py ask 'lace blouse size S under $15'
+
+Your query did not result any results.Try using broader words. For example, 'jeans' returns more than 'straight petite denim' Remove the size from the query or try a different one. Raising your max price may help.
 
 ```
 

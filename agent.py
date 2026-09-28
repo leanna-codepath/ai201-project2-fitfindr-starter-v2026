@@ -46,6 +46,55 @@ def new_session(query: str, wardrobe: dict) -> dict:
         "error": None,               # set when the run ended early
     }
 
+def parse(query):
+    text = query if query else ""
+    max_price = None
+    size = None
+
+    words = text.split()
+    description_words = []
+    i = 0
+
+    while i < len(words):
+        word = words[i]
+
+        if word.startswith("$"):
+            price_text = word[1:]
+
+            try:
+                max_price = float(price_text)
+                i += 1
+                continue
+            except ValueError:
+                pass
+        
+        if word.lower() in ("under", "below", "less"):
+            if i + 1 < len(words):
+                next_word = words[i + 1]
+
+                if next_word.startswith("$"):
+                    try:
+                        max_price = float(next_word[1:])
+                        i += 2
+                        continue
+                    except ValueError:
+                        pass
+
+        if word.lower() == "size" and i + 1 < len(words):
+            size = words[i + 1].strip(" ,").upper()
+            i += 2
+            continue
+
+        description_words.append(word)
+        i += 1
+
+    description = " ".join(description_words).strip(" ,")
+
+    return {
+        "description": description,
+        "size": size,
+        "max_price": max_price,
+    }
 
 # ── planning loop ─────────────────────────────────────────────────────────────
 
@@ -106,10 +155,44 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         than a stack trace. The import is already at the top of this file.
     """
     session = new_session(query, wardrobe)
+    iterations = 0
 
-    # TODO: delete these two lines and build the loop.
-    session["error"] = "The planning loop isn't built yet — see the TODO in agent.py."
+    iterations += 1
+    trace.check_iterations(iterations)
+    parsed = parse(query)
+    session["parsed"] = parsed
+
+    iterations += 1
+    trace.check_iterations(iterations)
+    matches = search_listings(parsed['description'], parsed['size'], parsed['max_price'])
+    session["search_results"] = matches
+
+    if not matches:
+        output = (
+            f"Your query did not result any results."
+            f"Try using broader words. For example, 'jeans' returns more than 'straight petite denim'"
+            f"{'' if not parsed['size'] else "Remove the size from the query or try a different one."}"
+            f"{'' if not parsed['max_price'] else "Raising your max price may help"}"
+        )
+
+        session["error"] = output
+        return session
+
+    iterations += 1
+    trace.check_iterations(iterations)
+    session["selected_item"] = matches[0]
+
+    iterations += 1
+    trace.check_iterations(iterations)
+    session["outfit_suggestion"] = suggest_outfit(session["selected_item"], session["wardrobe"])
+
+    iterations += 1
+    trace.check_iterations(iterations)
+    session["fit_card"] = create_fit_card(session["outfit_suggestion"], session["selected_item"])
+
     return session
+
+    
 
 
 # ── running it directly ───────────────────────────────────────────────────────
