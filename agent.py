@@ -96,6 +96,21 @@ def parse(query):
         "max_price": max_price,
     }
 
+def listing_search(parsed):
+    try:
+        import mcp_client
+
+        results = mcp_client.call_tool("search_listings", 
+            {
+                "description": parsed["description"],
+                "size": parsed["size"],
+                "max_price": parsed["max_price"]
+            })
+
+        return results or []
+    except Exception:
+        return search_listings(parsed["description"], parsed["size"], parsed["max_price"])
+
 # ── planning loop ─────────────────────────────────────────────────────────────
 
 def run_agent(query: str, wardrobe: dict) -> dict:
@@ -164,7 +179,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 
     iterations += 1
     trace.check_iterations(iterations)
-    matches = search_listings(parsed['description'], parsed['size'], parsed['max_price'])
+    matches = listing_search(parsed)
     session["search_results"] = matches
 
     if not matches:
