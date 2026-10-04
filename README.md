@@ -267,13 +267,13 @@ Just scored the ultimate Knit Cardigan — Chunky Brown for only $35 on depop an
 | 1 | Matching run completes all 3 tools | MET (5/5) | The target was 4/5. Every query with a match successfully went through all three tools. |
 | 2 | Impossible query stops before second tool | MET (5/5) | All impossible queries stopped before the second tool 5 out of 5 times. |
 | 3 | Item in session passes through three tools | MET (5/5) | Following the trace shows that each item query passes through all three tools 5 out of 5 times. |
-| 4 | Fit card contains title and price | MET (5/5) | Every fit card included the title from the listing and its price in the form `$,price>` |
+| 4 | Fit card contains title and price | MET (5/5) | Every fit card included the title from the listing and its price in the form `$,<price>` |
 | 5 | Caption includes natural sessions | MET (5/5) | Every fit card's caption was in natural sentences, without bullet points or syntax. |
 
 
 **Diagnoses**
 
-
+Some of the captions, while containing the title of the listing, did not properly capitialize it. This makes it difficult to distinguish the listing from the rest of the caption. To fix this, I tweaked the prompt to change this. 
 
 ---
 
@@ -331,24 +331,26 @@ Outfit 2: Pair the Low-Rise Cargo Pants — Khaki with the Oversized grey crewne
 
 ## The Improvement
 
-<!-- What you changed, why your diagnosis pointed at it, and the after-run in
-     the same table format. One change, measured properly.
-
-     `python run_eval.py --label after` -->
-
 **What I changed:**
+To improve the diagnoses, I tweaked the prompt and specified that the title of the listing should be capitalized in the same way.
 
 **Which failure it was meant to fix:**
+While there were no misses, this tightened the wording to make the listing more obvious in the
 
 ### Run Log — After
 
-**Criterion 1** 
+| Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
+|---|---|---|---|---|---|---|---|
+| 1. Matching run completes all 3 tools | 4/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 2. Impossible query stops before second tool | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 3. Item in session passes through three tools | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 4. Fit card contains title and price | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 5. Caption includes natural sessions | 4/5 | PASS | PASS | PASS | PASS | PASS | MET |
 
 
 **Did it help, and how do I know:**
 
-<!-- If it made things worse, say that. Honestly reported, that earns full
-     credit and is more interesting than one that worked. -->
+It both helped and didn't. More of the captions now include the capitalized title for easier distinguishment, but they also include the color included with the titles, which makes the captions seem more unnatural.
 
 
 

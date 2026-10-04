@@ -282,7 +282,7 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
         f"The outfit they plan to wear with it:\n{outfit}\n\n"
         f"Write the caption they would post about this fine and outfit\n"
         f"The caption must include three details which would allow readers to find the outfit themselves:"
-        f"the item title,\n the price written in digits as the format ${new_item['price']:g},\n"
+        f"the item title, capitalized in the same way as the listing,\n the price written in digits as the format ${new_item['price']:g},\n"
         f"the platform written in the form {new_item['platform']}\n"
         f"These details should be written in natural sentences, not listed."
         f"The look should also be specific, it should not like a product description"
