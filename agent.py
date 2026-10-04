@@ -176,11 +176,13 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     trace.check_iterations(iterations)
     parsed = parse(query)
     session["parsed"] = parsed
+    trace.step("parse_query", inputs=query, returned=parsed)
 
     iterations += 1
     trace.check_iterations(iterations)
     matches = listing_search(parsed)
     session["search_results"] = matches
+    trace.step("search_listings (MCP)", inputs=parsed, returned=matches)
 
     if not matches:
         output = (
@@ -196,14 +198,17 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     iterations += 1
     trace.check_iterations(iterations)
     session["selected_item"] = matches[0]
+    trace.step("select_best_match", returned=session["selected_item"])
 
     iterations += 1
     trace.check_iterations(iterations)
     session["outfit_suggestion"] = suggest_outfit(session["selected_item"], session["wardrobe"])
+    trace.step("suggest_outfit", inputs=session["selected_item"], returned=session["outfit_suggestion"])
 
     iterations += 1
     trace.check_iterations(iterations)
     session["fit_card"] = create_fit_card(session["outfit_suggestion"], session["selected_item"])
+    trace.step("fit_card", inputs=session["selected_item"], returned=session["fit_card"])
 
     return session
 

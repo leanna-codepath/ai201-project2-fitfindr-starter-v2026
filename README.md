@@ -79,17 +79,6 @@ price, to ensure you can adapt your queries.
 
 ## Planning Loop
 
-<!-- Your branch rule, stated as a rule — the condition AND both paths — plus
-     the file and function that holds it.
-
-     Like this:
-       "If search_listings returns an empty list, put a message in the session
-        and stop. Otherwise take the first result and go to suggest_outfit."
-        — agent.py::run_agent
-
-     The grader checks your code against what you claim here, so the file and
-     function have to be real. -->
-
 **Branch rule:**
 If `search_listing` returns an empty list, a message is returned to the user naming the things they could change, including the description, price, and size. It then returns without calling `suggest_outfit`. Otherwise, it takes the first result in the list and sends it to `suggest_outfit`.
 
@@ -104,11 +93,6 @@ The first match from `search_listings` moves through the session.
 ---
 
 ## Sample Run
-
-<!-- Two things go here.
-
-     1. One FULL query and its output, pasted as text.
-     2. Your three per-tool terminal tests — the command and what it printed. -->
 
 **One full query**
 
@@ -170,13 +154,6 @@ Scored these vintage Levi's 501 Jeans — Medium Wash for just $38 on depop and 
 ---
 
 ## How I Used AI
-
-<!-- Two specific moments. What you asked, what came back, what you changed.
-
-     "I used Claude to help me code" is not enough.
-
-     "I gave Claude my search_listings spec. It returned None on no match
-     instead of an empty list, so I changed it" is the level we want. -->
 
 **Moment 1**
 
@@ -259,32 +236,51 @@ that produced it:
 
 ## Loop Trace
 
-<!-- One full run, printed step by step, with the MCP call visible in it.
-
-     `python app.py ask '...' --trace` once you've added the trace.step()
-     calls in Milestone 2.
-
-     Worth pasting BOTH the happy path and the empty-search path. The empty
-     one should be visibly shorter, because it stops. If your two traces are
-     the same length, your branch isn't working — and this is the fastest way
-     anyone will ever find that out. -->
 
 **Happy path**
 
 ```
+[1] parse_query
+      in:  vintage low-rise jeans under $30
+      out: dict with keys: description, size, max_price
+[2] search_listings (MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Low-Rise Cargo Pants — Khaki, Straight Leg Black Jeans — Faded, Leather Belt — Brown, Braided … +7 more
+[3] select_best_match
+      out: Low-Rise Cargo Pants — Khaki ($27.0, poshmark)
+[4] suggest_outfit
+      in:  Low-Rise Cargo Pants — Khaki ($27.0, poshmark)
+      out: Outfit 1: Pair the Low-Rise Cargo Pants — Khaki with the White ribbed tank top, the Black cropped zip hoodie, …
+[5] fit_card
+      in:  Low-Rise Cargo Pants — Khaki ($27.0, poshmark)
+      out: I seriously gasped when I scored these vintage Low-Rise Cargo Pants — Khaki for only $27 on poshmark. They are…
 
+  Found:    Low-Rise Cargo Pants — Khaki — $27.0 on poshmark
+
+  Outfit:   Outfit 1: Pair the Low-Rise Cargo Pants — Khaki with the White ribbed tank top, the Black cropped zip hoodie, and the Chunky white sneakers.
+
+Outfit 2: Pair the Low-Rise Cargo Pants — Khaki with the Oversized grey crewneck sweatshirt, the Brown leather belt, and the Black combat boots.
+
+  Fit card: I seriously gasped when I scored these vintage Low-Rise Cargo Pants — Khaki for only $27 on poshmark. They are the ultimate throwback piece for my wardrobe rotation. I am obsessed with styling them either with a cropped hoodie and chunky sneakers for running errands, or throwing on an oversized grey crewneck and combat boots for an effortlessly edgy coffee run.
+
+2 model calls this session, 500 prompt + 141 output tokens
 ```
 
 **Empty search**
 
 ```
+[1] parse_query
+      in:  vintage low-rise jeans under $0
+      out: dict with keys: description, size, max_price
+[2] search_listings (MCP)
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
+
+  Your query did not result any results.Try using broader words. For example, 'jeans' returns more than 'straight petite denim'
 
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything
-behaved differently afterwards. If the rewire didn't work, say exactly where it
-broke — the error text and the last thing that worked. That earns the point in
-full. -->
+**On the MCP move:** <!-- what changed in your code, and whether anything behaved differently afterwards. If the rewire didn't work, say exactly where it broke — the error text and the last thing that worked. That earns the point in full. -->
 
 
 
