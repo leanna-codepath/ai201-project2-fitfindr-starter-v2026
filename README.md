@@ -323,9 +323,15 @@ Outfit 2: Pair the Low-Rise Cargo Pants — Khaki with the Oversized grey crewne
 
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything behaved differently afterwards. If the rewire didn't work, say exactly where it broke — the error text and the last thing that worked. That earns the point in full. -->
+**On the MCP move:** 
 
+Rather than being directly called, `search_listings` moves through an MCP. As such, when the agent calls this function, it actually
+uses `mcp_client.call_tool`. On the whole, this doesn't change any of the inputs, nor the return results, and the queries run in the same way. 
 
+**The Three Failures**
+- An empty search, tested with `vintage tee shirt under $0`, branches beofore `suggest_outfit` runs and gives the user possible changes they could make.
+- An empty wardrobe, tested with `--empty-wardrobe`, mentions the empty wardrobe, returns general advice, and writes a fit card. 
+- A mistake in a model, tested by creating an invalid API key, returns the error that caused the model to crash.
 
 ---
 
@@ -358,9 +364,7 @@ It both helped and didn't. More of the captions now include the capitalized titl
 
 ## What's Still Broken
 
-<!-- For each criterion still missed: what you'd do, and why you stopped where
-     you did. "I ran out of time" is fine if it's true. Pretending nothing is
-     left is not. -->
+If I were to continue improving this system I would further refine the prompt for the caption, to make it sound more natural, especially concerning the title of the garments.
 
 
 
