@@ -35,6 +35,27 @@ SCENARIOS = [
         "wardrobe": "empty",
         "criterion": None,
     },
+    {
+        # State transfers between steps, query doesn't matter
+        "name": "state transfers",
+        "query": "tan bag under $40",
+        "wardrobe": "example",
+        "criterion": 3,
+    },
+        {
+        # Finds one query to test the fit card
+        "name": "fit card names title and price",
+        "query": "vintage linen blazer",
+        "wardrobe": "example",
+        "criterion": 4,
+    },
+        {
+        # 
+        "name": "all fit cards are natural sentences",
+        "query": "knit cardigan under $40",
+        "wardrobe": "example",
+        "criterion": 5,
+    },
     # TODO: add what your criteria 3, 4 and 5 need.
     #
     # Set "criterion" to the number in criteria.md that the scenario tests.

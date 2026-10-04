@@ -204,29 +204,87 @@ that produced it:
 
 ## Verdicts and Diagnoses
 
-<!-- MET or MISSED per criterion against LAST UNIT's target, plus a sentence on
-     how you decided.
 
-     Then, for every miss: which of the four places it happened — a tool, the
-     loop's branch, the session, or the model's output — AND the mechanism.
+| Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
+|---|---|---|---|---|---|---|---|
+| 1. Matching run completes all 3 tools | 4/5 | PASS | PASS | PASS | PASS | PASS |  |
+| 2. Impossible query stops before second tool | 5/5 | PASS | PASS | PASS | PASS | PASS |  |
+| 3. Item in session passes through three tools | 5/5 | PASS | PASS | PASS | PASS | PASS |  |
+| 4. Fit card contains title and price | 5/5 | PASS | PASS | PASS | PASS | PASS |  |
+| 5. Caption includes natural sessions | 4/5 | PASS | PASS | PASS | PASS | PASS |  |
 
-     Not a diagnosis:  "The fit card was bad."
-     A diagnosis:      "The fit card criterion missed on 2 of 5 items. Both had
-                        an empty brand field. My prompt puts the brand in the
-                        first sentence, so the card opened with a blank and read
-                        like a fragment. The tool worked; the prompt assumed a
-                        field that isn't always there."
+**Criterion 1**
 
-     Look for a pattern. Three misses on the same tool is one problem, not
-     three. -->
+From `agent.py::run_agent` via the log:
 
-| # | Criterion | Target | Verdict | How I decided |
-|---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+- stopped early: no
+- selected_item: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+- search_results: 10
+
+Outfit suggestion:
+
+```
+Outfit 1:
+Y2K Baby Tee — Butterfly Print
+Baggy straight-leg jeans, dark wash
+Chunky white sneakers
+Black crossbody bag
+
+Outfit 2:
+Y2K Baby Tee — Butterfly Print
+Wide-leg khaki trousers
+Black combat boots
+Brown leather belt
+```
+
+Fit card:
+
+```
+I couldn't believe my luck finding this Y2K Baby Tee — Butterfly Print while digging through the racks yesterday. I grabbed it for just $18 on depop and knew it would be my new favorite piece. Today I'm styling it with dark baggy denim and chunky sneakers, but tomorrow I'll swap those for khaki trousers and combat boots.
+```
+
+**Criterion 2** 
+From `agent.py::run_agent` from the log:
+
+```
+- stopped early: yes — Your query did not result any results.Try using broader words. For example, 'jeans' returns more than 'straight petite denim'Remove the size from the query or try a different one.Raising your max price may help
+- selected_item: (none)
+- search_results: 0
+```
+
+**Criterion 3**
+From the trace lines produced by `trace.py::step `
+```
+[1] parse_query
+      in:  tan bag under $40
+      out: dict with keys: description, size, max_price
+[2] search_listings (MCP)
+      in:  dict with keys: description, size, max_price
+      out: 6 items: Mini Shoulder Bag — Tan Leather, Bucket Hat — Reversible, Brown Plaid, Vintage Knit Vest — Argyle Brown/Cream … +3 more
+[3] select_best_match
+      out: Mini Shoulder Bag — Tan Leather ($38.0, poshmark)
+[4] suggest_outfit
+      in:  Mini Shoulder Bag — Tan Leather ($38.0, poshmark)
+      out: Outfit 1: White ribbed tank top Wide-leg khaki trousers Black combat boots Mini Shoulder Bag — Tan Leather  Ou…
+[5] fit_card
+      in:  Mini Shoulder Bag — Tan Leather ($38.0, poshmark)
+      out: I can’t believe I scored this gorgeous Mini Shoulder Bag — Tan Leather for only $38 on poshmark. It instantly …
+```
+
+**Criterion 4**
+All five cards have the same title and price, from `tools.py::create_fit_card`:
+
+```
+Found this dreamy Mini Shoulder Bag — Tan Leather on poshmark for only $38 and she is officially my new everyday go-to. I love throwing it over an oversized grey crewneck and baggy jeans for running errands, or dressing it up with khaki trousers and combat boots. It’s the ultimate little vintage piece that somehow ties every single outfit together.
+```
+
+**Criterion 5**
+All card captions are made of natural sentences, from `tools.py::create_fit_card`:
+
+```
+Just scored the ultimate Knit Cardigan — Chunky Brown for only $35 on depop and I am already obsessed. I threw it on today over a crisp white ribbed tank, dark wash baggy jeans, and my trusty chunky white sneakers for the coziest coffee run. Later this week, I'm definitely pairing it with wide-leg khaki trousers, a cropped black hoodie, and combat boots for that perfect messy-chic vibe.
+```
+
 
 **Diagnoses**
 
@@ -299,13 +357,8 @@ Outfit 2: Pair the Low-Rise Cargo Pants — Khaki with the Oversized grey crewne
 
 ### Run Log — After
 
-| Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
-|---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+**Criterion 1** 
+
 
 **Did it help, and how do I know:**
 
