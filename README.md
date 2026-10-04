@@ -176,42 +176,17 @@ Scored these vintage Levi's 501 Jeans — Medium Wash for just $38 on depop and 
 
 ## Run Log — Before
 
-<!-- Five criteria, five tries each, in this exact format.
-
-     Five, because your criteria are written out of five. Mark each try PASS
-     or FAIL, count the passes, and read that count against your target — a
-     row targeting 4 of 5 with three PASS cells is MISSED (3/5).
-
-     `python run_eval.py --label before` runs everything and writes the table
-     into results/. Paste it here and fill in the verdicts. -->
-
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. Matching run completes all 3 tools | 4/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 2. Impossible query stops before second tool | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 3. Item in session passes through three tools | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 4. Fit card contains title and price | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 5. Caption includes natural sessions | 4/5 | PASS | PASS | PASS | PASS | PASS | MET |
 
 **Real output from one try**, pasted as text, naming the file and function
 that produced it:
 
-```
-
-```
-
----
-
-## Verdicts and Diagnoses
-
-
-| Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
-|---|---|---|---|---|---|---|---|
-| 1. Matching run completes all 3 tools | 4/5 | PASS | PASS | PASS | PASS | PASS |  |
-| 2. Impossible query stops before second tool | 5/5 | PASS | PASS | PASS | PASS | PASS |  |
-| 3. Item in session passes through three tools | 5/5 | PASS | PASS | PASS | PASS | PASS |  |
-| 4. Fit card contains title and price | 5/5 | PASS | PASS | PASS | PASS | PASS |  |
-| 5. Caption includes natural sessions | 4/5 | PASS | PASS | PASS | PASS | PASS |  |
 
 **Criterion 1**
 
@@ -284,6 +259,16 @@ All card captions are made of natural sentences, from `tools.py::create_fit_card
 ```
 Just scored the ultimate Knit Cardigan — Chunky Brown for only $35 on depop and I am already obsessed. I threw it on today over a crisp white ribbed tank, dark wash baggy jeans, and my trusty chunky white sneakers for the coziest coffee run. Later this week, I'm definitely pairing it with wide-leg khaki trousers, a cropped black hoodie, and combat boots for that perfect messy-chic vibe.
 ```
+
+## Verdicts and Diagnoses
+
+| # | Criterion | Verdict | How I decided |
+|---|---|---|---|
+| 1 | Matching run completes all 3 tools | MET (5/5) | The target was 4/5. Every query with a match successfully went through all three tools. |
+| 2 | Impossible query stops before second tool | MET (5/5) | All impossible queries stopped before the second tool 5 out of 5 times. |
+| 3 | Item in session passes through three tools | MET (5/5) | Following the trace shows that each item query passes through all three tools 5 out of 5 times. |
+| 4 | Fit card contains title and price | MET (5/5) | Every fit card included the title from the listing and its price in the form `$,price>` |
+| 5 | Caption includes natural sessions | MET (5/5) | Every fit card's caption was in natural sentences, without bullet points or syntax. |
 
 
 **Diagnoses**
